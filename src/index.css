@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import "./reset.css";
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('./fonts/Roboto-Regular.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Karla';
+  src: url('./fonts/Karla-Regular.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-roboto: Roboto, sans-serif;
+
+  --font-karla: Karla, sans-serif;
+
+  --color-grey: rgba(0, 0, 0, 0.50);
+
+  --color-black-high: rgba(0, 0, 0, 0.87);
+
+  --colot-black-medium: rgba(0, 0, 0, 0.60);
+
+  --color-pharagraph: #212121;
+
+  --color-light: #FFF;
+  
+  --color-primary-light: #F2F9FE;
+
+  --color-primary-accent: #2196F3;
+
+  --spacing-header-hight: 60px;
+
+  --spacing-header-padding: 210px;
+
+  --shadow-header-shadow: -2px 0 8px 2px rgba(0, 0, 0, 0.10);
+}
+
+:root {
+  --container-width: 1440px;
+  --container-padding-x: 15px;
+}
+
+.container {
+  @apply mx-auto px-[var(--container-padding-x)] max-w-[calc(var(--container-width)_+_var(--container-padding-x)*2)];
+}
