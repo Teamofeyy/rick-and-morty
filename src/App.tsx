@@ -1,17 +1,18 @@
-import Header from "./components/Header"
+import { Route, Routes } from "react-router"
+import Layout from "./Layout"
+import HomePage from "./pages/HomePage"
 
 
 function App() {
 
   return (
-    <>
-      <Header />
-      <main>
-        <section className="container flex justify-center">
-          <img className="mt-6" src="/assets/big-logo.svg" alt="" />
-        </section>
-      </main>
-    </>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        {/* <Route path="/locations" element={<LocationsPage />} />
+        <Route path="/episodes" element={EpisodesPage />} /> */}
+      </Routes>
+    </Layout>
 
   )
 }
