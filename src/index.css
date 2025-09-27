@@ -41,6 +41,9 @@
   --spacing-header-padding: 210px;
 
   --shadow-header-shadow: -2px 0 8px 2px rgba(0, 0, 0, 0.10);
+
+  --shadow-card-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.20), 0 3px 4px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.14);
+  --shadow-footer: -2px 0 8px 2px rgba(0, 0, 0, 0.10);
 }
 
 :root {
@@ -49,5 +52,5 @@
 }
 
 .container {
-  @apply mx-auto px-[var(--container-padding-x)] max-w-[calc(var(--container-width)_+_var(--container-padding-x)*2)];
+  @apply max-w-[1020px];
 }

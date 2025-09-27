@@ -1,13 +1,14 @@
 import { useState } from "react";
 import FilterSelect from "../components/FilterSelect";
 import SearchInput from "../components/SearchInput"
+import { Characters } from "../components/Characters";
 
 const HomePage = () => {
   const [q, setQ] = useState<string>("");
 
   return (
-    <>
-      <section aria-labelledby='hero-title'>
+    <div className="">
+      <section aria-labelledby='hero-title' className="flex justify-center">
         <div className='container flex justify-center'>
           <img className="mt-6" src="../assets/big-logo.svg" alt="Rick & Morty" />
           <h1 id="hero-title" className="sr-only">
@@ -16,7 +17,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section aria-labelledby="filters-title" className="py-8">
+      <section aria-labelledby="filters-title" className="py-8 mb-16 flex justify-center ">
         <div className="container flex justify-center gap-5">
           <h2 id="filters-title" className="sr-only">Поиск по имени, фильтры.</h2>
           {/* <Filters /> */}
@@ -26,7 +27,11 @@ const HomePage = () => {
           <FilterSelect name="Status" />
         </div>
       </section>
-    </>
+
+      <section aria-labelledby="results-title">
+        <div className="flex justify-center"><Characters /></div>
+      </section>
+    </div>
   )
 }
 
