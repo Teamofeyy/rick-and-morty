@@ -3,8 +3,10 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import fetchCharacters from "../api/axios.api";
 import Card from "./Card";
 import type { Character, Info } from "../api/types";
+import { useNavigate } from "react-router";
 
 export const Characters: React.FC = () => {
+  const navigate = useNavigate();
   const {
     data,
     fetchNextPage,
@@ -37,7 +39,7 @@ export const Characters: React.FC = () => {
               image={char.image}
               title={char.name}
               description={char.species}
-              onClick={() => { }}
+              onClick={() => navigate(`/character/${char.id}`)}
             />
           )) ?? []
         )}

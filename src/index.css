@@ -43,6 +43,7 @@
   --shadow-header-shadow: -2px 0 8px 2px rgba(0, 0, 0, 0.10);
 
   --shadow-card-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.20), 0 3px 4px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.14);
+
   --shadow-footer: -2px 0 8px 2px rgba(0, 0, 0, 0.10);
 }
 
@@ -53,4 +54,16 @@
 
 .container {
   @apply max-w-[1020px];
+}
+
+.dl-heading {
+  @apply text-[#081F32] font-roboto font-bold leading-6 tracking-[0.15px] text-[16px];
+}
+
+.dl-desc {
+  @apply text-[#6E798C] font-roboto text-sm font-normal leading-5 tracking-[0.25px];
+}
+
+.headline {
+  @apply text-[#8E8E93] font-roboto text-xl font-medium leading-6 tracking-[0.15px]
 }

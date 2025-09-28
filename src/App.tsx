@@ -12,9 +12,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="charachter/:id" element={<CharachterPage />} />
-          {/* <Route path="/locations" element={<LocationsPage />} />
-        <Route path="/episodes" element={EpisodesPage />} /> */}
+          <Route path="character/:id" element={<CharachterPage />} />
         </Routes>
       </Layout>
     </QueryClientProvider>
