@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/axios.api";
 import type { Character, Episode } from "../api/types";
@@ -16,6 +16,7 @@ async function fetchEpisodes(urls: string[]) {
 }
 
 const CharacterPage = () => {
+  const navigate = useNavigate()
   const { id } = useParams<{ id: string }>();
 
   const { data, isLoading, error } = useQuery<Character>({
@@ -53,7 +54,7 @@ const CharacterPage = () => {
             <InfoPlank title="Specie" desc={data?.species} />
             <InfoPlank title="Origin" desc={data?.gender} />
             <InfoPlank title="Type" desc={data?.type} />
-            <InfoPlank title="Location" desc={data?.gender} />
+            <InfoPlank title="Location" desc={data?.location.name} onClick={() => navigate(`/location/${data?.location.url.split('/').pop()}`)} icon="../assets/arrow-right.svg" />
           </div>
 
           <div className="flex flex-col">
@@ -66,6 +67,8 @@ const CharacterPage = () => {
                 title={ep.episode}
                 desc={ep.name}
                 sndDesc={ep.air_date}
+                icon="../assets/arrow-right.svg"
+                onClick={() => navigate(`/episode/${ep.id}`)}
               />
             ))}
           </div>
