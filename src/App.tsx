@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router"
 import Layout from "./Layout"
 import HomePage from "./pages/HomePage"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import CharachterPage from "./pages/CharachterPage";
+import CharachterPage from "./pages/CharacterPage";
 import LocationPage from "./pages/LocationPage";
 import LocationsPage from "./pages/LocationsPage";
 import EpisodesPage from "./pages/EpisodesPage";

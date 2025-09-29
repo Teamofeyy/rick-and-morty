@@ -16,13 +16,13 @@ const Header = () => {
       <nav>
         <ul className="flex gap-6 text-[18px] font-bold font-karla">
           <li>
-            <Link to="/">Characters</Link>
+            <Link to="/" className="transition-colors hover:text-primary-accent active:opacity-80">Characters</Link>
           </li>
           <li>
-            <Link to="/locations">Locations</Link>
+            <Link to="/locations" className="transition-colors hover:text-primary-accent active:opacity-80">Locations</Link>
           </li>
           <li>
-            <Link to="/episodes">Episodes</Link>
+            <Link to="/episodes" className="transition-colors hover:text-primary-accent active:opacity-80">Episodes</Link>
           </li>
         </ul>
       </nav>

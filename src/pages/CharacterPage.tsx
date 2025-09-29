@@ -39,7 +39,7 @@ const CharacterPage = () => {
             <InfoPlank title="Specie" desc={data?.species} />
             <InfoPlank title="Origin" desc={data?.origin.name} />
             <InfoPlank title="Type" desc={data?.type || "Unknown"} />
-            <InfoPlank title="Location" desc={data?.location.name} onClick={() => navigate(`/location/${data?.location.url.split('/').pop()}`)} icon="../assets/arrow-right.svg" />
+            <InfoPlank title="Location" desc={data?.location.name} onClick={() => navigate(`/location/${data?.location.url.split('/').pop()}`)} icon="../assets/arrow-right.svg" className="cursor-pointer" />
           </div>
 
           <div className="flex flex-col">
@@ -54,6 +54,7 @@ const CharacterPage = () => {
                 sndDesc={ep.air_date}
                 icon="../assets/arrow-right.svg"
                 onClick={() => navigate(`/episode/${ep.id}`)}
+                className="cursor-pointer"
               />
             ))}
           </div>
