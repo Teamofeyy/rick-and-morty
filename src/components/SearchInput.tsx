@@ -3,9 +3,10 @@ type Props = {
   onChange: (v: string) => void;
   placeholder?: string;
   name?: string;
+  className?: string;
 }
 
-const SearchInput = ({ value, onChange, placeholder, name = "q", }: Props) => {
+const SearchInput = ({ value, onChange, placeholder, name = "q", className }: Props) => {
   return (
 
     <div className="relative">
@@ -22,7 +23,7 @@ const SearchInput = ({ value, onChange, placeholder, name = "q", }: Props) => {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="flex items-center gap-2 shrink-0 self-stretch w-60 border border-grey rounded-lg p-4 pl-10"
+        className={`flex items-center gap-2 shrink-0 self-stretch w-60 border border-grey rounded-lg p-4 pl-10 ${className}`}
         aria-label={placeholder}
       />
     </div>

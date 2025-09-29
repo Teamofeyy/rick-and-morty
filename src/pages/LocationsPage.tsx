@@ -22,7 +22,7 @@ const LocationsPage = () => {
       <section aria-labelledby="filters-title" className="py-8 mb-16 flex justify-center ">
         <div className="container flex justify-center gap-5">
           <h2 id="filters-title" className="sr-only">Поиск по имени, фильтры.</h2>
-          <SearchInput value={q} onChange={setQ} placeholder="Filter by name..." />
+          <SearchInput value={q} onChange={setQ} placeholder="Filter by name..." className="w-[326px]" />
           <FilterSelect name="Type" />
           <FilterSelect name="Dimension" />
         </div>

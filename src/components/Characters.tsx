@@ -4,6 +4,7 @@ import Card from "./Card";
 import type { Character, Info } from "../api/types";
 import { useNavigate } from "react-router";
 import { usePaginatedResource } from "@/hooks/usePaginatedResource";
+import CardSkeleton from "./Skeleton";
 
 type CharactersProps = { q?: string };
 
@@ -13,6 +14,18 @@ export const Characters: React.FC<CharactersProps> = ({ q }) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     usePaginatedResource<Character, string | undefined>(["characters"], getCharacters, q);
 
+
+  if (status === "pending") {
+    return (
+      <div className="flex container flex-col items-center gap-6">
+        <div className="flex flex-wrap justify-center gap-4">
+          {Array.from({ length: 12 }).map((_, idx) => (
+            <CardSkeleton variant="character" key={idx} />
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (status === "error") return <p>Error loading characters</p>;
 
   return (

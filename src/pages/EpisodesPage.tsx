@@ -21,7 +21,7 @@ const EpisodesPage = () => {
       <section aria-labelledby="filters-title" className="py-8 mb-16 flex justify-center ">
         <div className="container flex justify-center gap-5">
           <h2 id="filters-title" className="sr-only">Поиск по имени</h2>
-          <SearchInput value={q} onChange={setQ} placeholder="Filter by name or episode (ex. S01 or S01E02)" />
+          <SearchInput value={q} onChange={setQ} placeholder="Filter by name or episode (ex. S01 or S01E02)" className="w-[500px]" />
         </div>
       </section>
 
