@@ -1,4 +1,3 @@
-
 type Props = {
   value: string;
   onChange: (v: string) => void;
@@ -14,7 +13,7 @@ const SearchInput = ({ value, onChange, placeholder, name = "q", }: Props) => {
         {placeholder}
       </label>
 
-      <img src="../assets/search.svg" alt="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6" />
+      <img src="/assets/search.svg" alt="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6" />
 
       <input
         id={name}

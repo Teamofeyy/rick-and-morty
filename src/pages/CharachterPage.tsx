@@ -1,19 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../api/axios.api";
 import type { Character, Episode } from "../api/types";
 import InfoPlank from "../components/InfoPlank";
-
-async function fetchCharacter(id: string) {
-  const { data } = await api.get<Character>(`/character/${id}`);
-  return data;
-}
-
-async function fetchEpisodes(urls: string[]) {
-  const firstFour = urls.slice(0, 4)
-  const responses = await Promise.all(firstFour.map((url) => api.get<Episode>(url)));
-  return responses.map((r) => r.data);
-}
+import { fetchResourcesByUrls, getCharacterById } from "@/api/services";
 
 const CharacterPage = () => {
   const navigate = useNavigate()
@@ -21,17 +10,13 @@ const CharacterPage = () => {
 
   const { data, isLoading, error } = useQuery<Character>({
     queryKey: ["character", id],
-    queryFn: () => fetchCharacter(id!),
+    queryFn: () => getCharacterById(id!),
     enabled: !!id,
   });
 
-  const {
-    data: episodes,
-    isLoading: episodesLoading,
-    error: episodesError,
-  } = useQuery<Episode[]>({
+  const { data: episodes, isLoading: episodesLoading, error: episodesError } = useQuery<Episode[]>({
     queryKey: ["episodes", id, data?.episode],
-    queryFn: () => fetchEpisodes(data!.episode),
+    queryFn: () => fetchResourcesByUrls<Episode>(data!.episode),
     enabled: !!data,
   });
 
@@ -52,8 +37,8 @@ const CharacterPage = () => {
             <InfoPlank title="Gender" desc={data?.gender} />
             <InfoPlank title="Status" desc={data?.status} />
             <InfoPlank title="Specie" desc={data?.species} />
-            <InfoPlank title="Origin" desc={data?.gender} />
-            <InfoPlank title="Type" desc={data?.type} />
+            <InfoPlank title="Origin" desc={data?.origin.name} />
+            <InfoPlank title="Type" desc={data?.type || "Unknown"} />
             <InfoPlank title="Location" desc={data?.location.name} onClick={() => navigate(`/location/${data?.location.url.split('/').pop()}`)} icon="../assets/arrow-right.svg" />
           </div>
 
@@ -61,7 +46,7 @@ const CharacterPage = () => {
             <h2 className="headline">Episodes</h2>
             {episodesLoading && <p>Loading episodes...</p>}
             {episodesError && <p>Failed to load episodes</p>}
-            {episodes?.map((ep) => (
+            {episodes?.slice(0, 4).map((ep) => (
               <InfoPlank
                 key={ep.id}
                 title={ep.episode}

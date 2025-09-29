@@ -1,32 +1,18 @@
 import React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import fetchCharacters from "../api/axios.api";
+import { getCharacters } from "../api/services";
 import Card from "./Card";
 import type { Character, Info } from "../api/types";
 import { useNavigate } from "react-router";
+import { usePaginatedResource } from "@/hooks/usePaginatedResource";
 
-export const Characters: React.FC = () => {
+type CharactersProps = { q?: string };
+
+export const Characters: React.FC<CharactersProps> = ({ q }) => {
   const navigate = useNavigate();
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery<Info<Character>>({
-    queryKey: ["characters"],
-    queryFn: ({ pageParam = 1 }) => fetchCharacters(pageParam as number),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      const nextUrl = lastPage?.info?.next;
-      if (!nextUrl) return undefined;
-      const url = new URL(nextUrl);
-      const page = url.searchParams.get("page");
-      return page ? Number(page) : undefined;
-    },
-  });
 
-  if (status === "pending") return <p>Loading...</p>;
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    usePaginatedResource<Character, string | undefined>(["characters"], getCharacters, q);
+
   if (status === "error") return <p>Error loading characters</p>;
 
   return (
