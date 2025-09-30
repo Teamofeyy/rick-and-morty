@@ -48,7 +48,7 @@ export const Characters: React.FC<CharactersProps> = ({ q }) => {
         <button
           onClick={() => fetchNextPage()}
           disabled={isFetchingNextPage}
-          className="bg-primary-light text-sm font-roboto font-medium leading-4 tracking-[1.25px] text-primary-accent py-2.5 px-8 rounded-sm mt-6 uppercase transition hover:bg-primary-accent/10 active:scale-[0.98] disabled:opacity-60"
+          className="bg-primary-light text-sm font-roboto font-medium leading-4 tracking-[1.25px] text-primary-accent py-2.5 px-8 rounded-sm mt-3 uppercase transition hover:bg-primary-accent/10 active:scale-[0.98] disabled:opacity-60"
         >
           {isFetchingNextPage ? "Loading..." : "Load more"}
         </button>

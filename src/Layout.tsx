@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </a>
 
       <Header />
-      <main id="main-content" tabIndex={-1} className="min-h-screen mb-11">
+      <main id="main-content" tabIndex={-1} className="min-h-screen mb-5">
         {children}
       </main>
 

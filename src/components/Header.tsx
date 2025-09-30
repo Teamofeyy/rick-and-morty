@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Header = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <header className="flex bg-white justify-between items-center min-h-header-hight px-header-padding shadow-header-shadow">
+    <header className="flex justify-between items-center px-6 py-1.5 shadow-header-shadow">
       <Link to="/">
         <img
           src="/assets/logo-black 1.svg"
@@ -13,7 +16,7 @@ const Header = () => {
         />
       </Link>
 
-      <nav>
+      <nav className="hidden md:flex">
         <ul className="flex gap-6 text-[18px] font-bold font-karla">
           <li>
             <Link to="/" className="transition-colors hover:text-[#858585] active:opacity-80">Characters</Link>
@@ -26,6 +29,14 @@ const Header = () => {
           </li>
         </ul>
       </nav>
+
+      <button type="button" className="block md:hidden" onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? (
+          <img src="/assets/close-icon.svg" alt="" />
+        ) : (
+          <img src="/assets/burger-icon.svg" alt="" />
+        )}
+      </button>
     </header>
   );
 };

@@ -23,7 +23,7 @@ const SearchInput = ({ value, onChange, placeholder, name = "q", className }: Pr
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`flex items-center gap-2 shrink-0 self-stretch w-60 border border-grey rounded-lg p-4 pl-10 ${className}`}
+        className={`flex items-center gap-2 shrink-0 self-stretch w-80 sm:w-120 md:w-60 border border-grey rounded-lg p-4 pl-10 ${className}`}
         aria-label={placeholder}
       />
     </div>
