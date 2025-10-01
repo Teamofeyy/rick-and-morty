@@ -14,10 +14,13 @@ const CharacterPage = () => {
     enabled: !!id,
   });
 
+  const episodeUrls = data?.episode?.slice(0, 4) as string[] | undefined;
+
   const { data: episodes, isLoading: episodesLoading, error: episodesError } = useQuery<Episode[]>({
-    queryKey: ["episodes", id, data?.episode],
-    queryFn: () => fetchResourcesByUrls<Episode>(data!.episode),
-    enabled: !!data,
+    queryKey: ["episodes", id, episodeUrls],
+    queryFn: () => fetchResourcesByUrls<Episode>(episodeUrls || []),
+    enabled: !!episodeUrls && episodeUrls.length > 0,
+    staleTime: 1000 * 60 * 5,
   });
 
   if (isLoading) return <p>Loading...</p>;
