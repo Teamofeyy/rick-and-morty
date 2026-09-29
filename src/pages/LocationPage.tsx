@@ -1,57 +1,62 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { Location, Character } from "../api/types";
-import Card from "../components/Card";
-import { fetchResourcesByUrls, getLocationById } from "@/api/services";
+import CharacterCard from "@/components/CharacterCard";
+import PageMessage from "@/components/PageMessage";
+import { getLocationById, getResourcesByUrls } from "@/api/services";
+import { parseResourceId } from "@/utils/resourceId";
 
 export default function LocationPage() {
-  const navigate = useNavigate();
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = parseResourceId(routeId);
 
-  const { id } = useParams<{ id: string }>();
-
-  const { data, isLoading, error } = useQuery<Location>({
+  const locationQuery = useQuery<Location>({
     queryKey: ["location", id],
-    queryFn: () => getLocationById(id!),
-    enabled: !!id,
+    queryFn: ({ signal }) => {
+      if (id === null) throw new Error("A valid location ID is required");
+      return getLocationById(id, signal);
+    },
+    enabled: id !== null,
   });
 
-  const { data: residents } = useQuery<Character[]>({
-    queryKey: ["residents", id, data?.residents],
-    queryFn: () => fetchResourcesByUrls<Character>(data!.residents),
-    enabled: !!data,
+  const residentUrls = locationQuery.data?.residents ?? [];
+  const residentsQuery = useQuery<Character[]>({
+    queryKey: ["characters", "location", id, residentUrls],
+    queryFn: ({ signal }) => getResourcesByUrls<Character>("character", residentUrls, signal),
+    enabled: id !== null && residentUrls.length > 0,
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading location</p>;
+  if (id === null) return <PageMessage error>Invalid location ID.</PageMessage>;
+  if (locationQuery.isPending) return <PageMessage>Loading location...</PageMessage>;
+  if (locationQuery.isError) return <PageMessage error>Unable to load this location.</PageMessage>;
+
+  const location = locationQuery.data;
 
   return (
     <div className="container flex flex-col items-center mx-auto py-[30px]">
-      <h1 className="text-[#081F32] font-roboto text-4xl">{data?.name}</h1>
-      <div className="flex justify-center gap-52 mt-6">
+      <h1 className="text-[#081F32] font-roboto text-4xl text-center">{location.name}</h1>
+      <dl className="flex justify-center gap-12 sm:gap-52 mt-6">
         <div>
-          <h3 className="dl-heading mb-0">Type</h3>
-          <p className="dl-desc">{data?.type}</p>
+          <dt className="dl-heading mb-0">Type</dt>
+          <dd className="dl-desc">{location.type || "Unknown"}</dd>
         </div>
         <div>
-          <h3 className="dl-heading mb-0">Dimension</h3>
-          <p className="dl-desc">{data?.dimension}</p>
+          <dt className="dl-heading mb-0">Dimension</dt>
+          <dd className="dl-desc">{location.dimension || "Unknown"}</dd>
         </div>
-
-      </div>
-
+      </dl>
 
       <h2 className="headline self-start pt-16 pb-6">Residents</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {residents?.map((char) => (
-          <Card
-            key={char.id}
-            image={char.image}
-            title={char.name}
-            description={char.species}
-            onClick={() => navigate(`/character/${char.id}`)}
-          />
-        ))}
-      </div>
+      {residentUrls.length === 0 && <p>No known residents.</p>}
+      {residentsQuery.isLoading && <p>Loading residents...</p>}
+      {residentsQuery.isError && <p role="alert">Unable to load residents.</p>}
+      {residentsQuery.data && (
+        <div className="flex flex-wrap justify-center gap-4">
+          {residentsQuery.data.map((character) => (
+            <CharacterCard character={character} key={character.id} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

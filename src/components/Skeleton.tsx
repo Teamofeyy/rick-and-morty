@@ -1,12 +1,10 @@
-import React from "react";
-
 type CardSkeletonProps = {
   variant?: "character";
 };
 
-const CardSkeleton: React.FC<CardSkeletonProps> = ({ variant }) => {
+const CardSkeleton = ({ variant }: CardSkeletonProps) => {
   return (
-    <div className="relative max-w-[240px] flex flex-col rounded-sm bg-white shadow-card-shadow overflow-hidden">
+    <div className="relative w-[240px] max-w-full flex flex-col rounded-sm bg-white shadow-card-shadow overflow-hidden">
       {variant === "character" ? (
         <>
           <div className="w-[240px] h-[168px] bg-gray-200 animate-pulse" />

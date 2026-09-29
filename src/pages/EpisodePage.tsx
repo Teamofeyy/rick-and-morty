@@ -1,59 +1,62 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { Episode, Character } from "../api/types";
-import Card from "../components/Card";
-import { fetchResourcesByUrls, getEpisodeById } from "@/api/services";
+import CharacterCard from "@/components/CharacterCard";
+import PageMessage from "@/components/PageMessage";
+import { getEpisodeById, getResourcesByUrls } from "@/api/services";
+import { parseResourceId } from "@/utils/resourceId";
 
 export default function EpisodePage() {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = parseResourceId(routeId);
 
-  const {
-    data: episode,
-    isLoading,
-    error,
-  } = useQuery<Episode>({
+  const episodeQuery = useQuery<Episode>({
     queryKey: ["episode", id],
-    queryFn: () => getEpisodeById(id!),
-    enabled: !!id,
+    queryFn: ({ signal }) => {
+      if (id === null) throw new Error("A valid episode ID is required");
+      return getEpisodeById(id, signal);
+    },
+    enabled: id !== null,
   });
 
-  const { data: cast } = useQuery<Character[]>({
-    queryKey: ["cast", id, episode?.characters],
-    queryFn: () => fetchResourcesByUrls<Character>(episode!.characters),
-    enabled: !!episode,
+  const castUrls = episodeQuery.data?.characters ?? [];
+  const castQuery = useQuery<Character[]>({
+    queryKey: ["characters", "episode", id, castUrls],
+    queryFn: ({ signal }) => getResourcesByUrls<Character>("character", castUrls, signal),
+    enabled: id !== null && castUrls.length > 0,
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading episode</p>;
+  if (id === null) return <PageMessage error>Invalid episode ID.</PageMessage>;
+  if (episodeQuery.isPending) return <PageMessage>Loading episode...</PageMessage>;
+  if (episodeQuery.isError) return <PageMessage error>Unable to load this episode.</PageMessage>;
+
+  const episode = episodeQuery.data;
 
   return (
     <div className="container flex flex-col items-center mx-auto py-[30px]">
-      <h1 className="text-[#081F32] font-roboto text-4xl">{episode?.name}</h1>
+      <h1 className="text-[#081F32] font-roboto text-4xl text-center">{episode.name}</h1>
 
-      <div className="flex justify-center gap-52 mt-6">
+      <dl className="flex justify-center gap-12 sm:gap-52 mt-6">
         <div>
-          <h3 className="dl-heading mb-0">Air Date</h3>
-          <p className="dl-desc">{episode?.air_date}</p>
+          <dt className="dl-heading mb-0">Air date</dt>
+          <dd className="dl-desc">{episode.air_date}</dd>
         </div>
         <div>
-          <h3 className="dl-heading mb-0">Episode</h3>
-          <p className="dl-desc">{episode?.episode}</p>
+          <dt className="dl-heading mb-0">Episode</dt>
+          <dd className="dl-desc">{episode.episode}</dd>
         </div>
-      </div>
+      </dl>
 
       <h2 className="headline self-start pt-16 pb-6">Cast</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {cast?.map((char) => (
-          <Card
-            key={char.id}
-            image={char.image}
-            title={char.name}
-            description={char.species}
-            onClick={() => navigate(`/character/${char.id}`)}
-          />
-        ))}
-      </div>
+      {castQuery.isLoading && <p>Loading cast...</p>}
+      {castQuery.isError && <p role="alert">Unable to load the cast.</p>}
+      {castQuery.data && (
+        <div className="flex flex-wrap justify-center gap-4">
+          {castQuery.data.map((character) => (
+            <CharacterCard character={character} key={character.id} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

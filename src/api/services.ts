@@ -1,31 +1,96 @@
-import { api } from "./axios.api";
-import type { Character, Episode, Info, Location } from "./types";
+import axios from "axios";
+import { API_BASE_URL, api } from "./axios.api";
+import type { Character, Episode, Location, PaginatedResponse } from "./types";
 
-export const getCharacters = (page: number, name?: string) =>
-  api
-    .get<Info<Character>>("/character", { params: { page, name: name || undefined } })
-    .then(r => r.data);
+type ResourceName = "character" | "episode" | "location";
 
-export const getLocations = (page: number, name?: string) =>
-  api
-    .get<Info<Location>>("/location", { params: { page, name: name || undefined } })
-    .then(r => r.data);
+export type PageRequest = {
+  page: number;
+  search: string;
+  signal: AbortSignal;
+};
 
-export const getEpisodes = (page: number, name?: string) =>
-  api
-    .get<Info<Episode>>("/episode", { params: { page, name: name || undefined } })
-    .then(r => r.data);
+export type PageFetcher<T> = (request: PageRequest) => Promise<PaginatedResponse<T>>;
 
-export const getCharacterById = (id: string) =>
-  api.get<Character>(`/character/${id}`).then(r => r.data);
+const emptyPage = <T>(): PaginatedResponse<T> => ({
+  info: { count: 0, pages: 0, next: null, prev: null },
+  results: [],
+});
 
-export const getEpisodeById = (id: string) =>
-  api.get<Episode>(`/episode/${id}`).then(r => r.data);
+const createPageFetcher = <T>(resource: ResourceName): PageFetcher<T> =>
+  async ({ page, search, signal }) => {
+    try {
+      const response = await api.get<PaginatedResponse<T>>(`/${resource}`, {
+        params: { page, name: search || undefined },
+        signal,
+      });
 
-export const getLocationById = (id: string) =>
-  api.get<Location>(`/location/${id}`).then(r => r.data);
+      return response.data;
+    } catch (error) {
+      // The API uses 404 for a valid search with no matches.
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return emptyPage<T>();
+      }
 
-export async function fetchResourcesByUrls<T>(urls: string[]) {
-  const responses = await Promise.all(urls.map((u) => api.get<T>(u)));
-  return responses.map((r) => r.data);
+      throw error;
+    }
+  };
+
+const getResourceById = async <T>(
+  resource: ResourceName,
+  id: number,
+  signal: AbortSignal,
+) => {
+  const response = await api.get<T>(`/${resource}/${id}`, { signal });
+  return response.data;
+};
+
+export const getCharacters = createPageFetcher<Character>("character");
+export const getLocations = createPageFetcher<Location>("location");
+export const getEpisodes = createPageFetcher<Episode>("episode");
+
+export const getCharacterById = (id: number, signal: AbortSignal) =>
+  getResourceById<Character>("character", id, signal);
+
+export const getEpisodeById = (id: number, signal: AbortSignal) =>
+  getResourceById<Episode>("episode", id, signal);
+
+export const getLocationById = (id: number, signal: AbortSignal) =>
+  getResourceById<Location>("location", id, signal);
+
+export function getResourceIdFromUrl(url: string, resource: ResourceName): number | null {
+  try {
+    const parsedUrl = new URL(url);
+    const apiUrl = new URL(API_BASE_URL);
+    const match = new RegExp(`^/api/${resource}/(\\d+)/?$`).exec(parsedUrl.pathname);
+
+    if (parsedUrl.origin !== apiUrl.origin || !match) return null;
+
+    const id = Number(match[1]);
+    return Number.isSafeInteger(id) && id > 0 ? id : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getResourcesByUrls<T>(
+  resource: ResourceName,
+  urls: readonly string[],
+  signal: AbortSignal,
+): Promise<T[]> {
+  const ids = [...new Set(urls.map((url) => getResourceIdFromUrl(url, resource)))]
+    .filter((id): id is number => id !== null);
+
+  if (ids.length === 0) return [];
+
+  const response = await api.get<T | T[]>(`/${resource}/${ids.join(",")}`, { signal });
+  return Array.isArray(response.data) ? response.data : [response.data];
+}
+
+export function shouldRetryRequest(failureCount: number, error: unknown) {
+  if (axios.isAxiosError(error) && error.response?.status && error.response.status < 500) {
+    return false;
+  }
+
+  return failureCount < 2;
 }

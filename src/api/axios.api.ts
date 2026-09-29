@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+export const API_BASE_URL = 'https://rickandmortyapi.com/api'
+
 export const api = axios.create({
-  baseURL: 'https://rickandmortyapi.com/api',
+  baseURL: API_BASE_URL,
 })

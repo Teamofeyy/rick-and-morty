@@ -1,34 +1,23 @@
-import { useState } from "react";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import SearchInput from "../components/SearchInput"
+import BrowsePage from "@/components/BrowsePage";
+import { useSearchQuery } from "@/hooks/useSearchQuery";
 import Episodes from "../components/Episodes";
 
 const EpisodesPage = () => {
-  const [q, setQ] = useState<string>("");
-  const qDebounced = useDebouncedValue(q, 400);
+  const { search, debouncedSearch, setSearch } = useSearchQuery();
 
   return (
-    <div>
-      <section aria-labelledby='hero-title' className="flex justify-center">
-        <div className='container flex justify-center'>
-          <img className="mt-6" src="../assets/rick-and-morty2.svg" alt="Rick & Morty" />
-          <h1 id="hero-title" className="sr-only">
-            Персонажи Rick & Morty
-          </h1>
-        </div>
-      </section>
-
-      <section aria-labelledby="filters-title" className="py-8 mb-16 flex justify-center ">
-        <div className="container flex justify-center gap-5">
-          <h2 id="filters-title" className="sr-only">Поиск по имени</h2>
-          <SearchInput value={q} onChange={setQ} placeholder="Filter by name or episode (ex. S01 or S01E02)" className="w-[500px]" />
-        </div>
-      </section>
-
-      <section aria-labelledby="results-title">
-        <div className="flex justify-center"><Episodes q={qDebounced} /></div>
-      </section>
-    </div>
+    <BrowsePage
+      title="Episodes"
+      heroSrc="/assets/rick-and-morty2.webp"
+      heroWidth={270}
+      heroHeight={210}
+      search={search}
+      onSearchChange={setSearch}
+      searchPlaceholder="Filter by episode name..."
+      searchClassName="sm:w-[500px]"
+    >
+      <Episodes search={debouncedSearch} />
+    </BrowsePage>
   )
 }
 

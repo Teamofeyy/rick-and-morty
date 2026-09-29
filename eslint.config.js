@@ -12,14 +12,18 @@ export default defineConfig([
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
+      tseslint.configs.recommendedTypeChecked,
+      reactHooks.configs.flat['recommended-latest'],
       reactRefresh.configs.vite,
       ...pluginQuery.configs['flat/recommended'],
     ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
 ])

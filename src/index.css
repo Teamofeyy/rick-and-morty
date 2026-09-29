@@ -3,16 +3,16 @@
 
 @font-face {
   font-family: 'Roboto';
-  src: url('./fonts/Roboto-Regular.woff2') format('woff2');
-  font-weight: 100 900;
+  src: url('/fonts/Roboto-Regular.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Karla';
-  src: url('./fonts/Karla-Regular.woff2') format('woff2');
-  font-weight: 100 900;
+  src: url('/fonts/Karla-Regular.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
@@ -36,7 +36,7 @@
 
   --color-primary-accent: #2196F3;
 
-  --spacing-header-hight: 60px;
+  --spacing-header-height: 60px;
 
   --spacing-header-padding: 210px;
 
@@ -53,7 +53,7 @@
 }
 
 .container {
-  @apply max-w-[1020px];
+  @apply w-full max-w-[1020px] px-4;
 }
 
 .dl-heading {
@@ -65,5 +65,5 @@
 }
 
 .headline {
-  @apply text-[#8E8E93] font-roboto text-xl font-medium leading-6 tracking-[0.15px]
+  @apply text-[#8E8E93] font-roboto text-xl font-medium leading-6 tracking-[0.15px];
 }

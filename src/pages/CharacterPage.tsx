@@ -1,63 +1,83 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { Character, Episode } from "../api/types";
-import InfoPlank from "../components/InfoPlank";
-import { fetchResourcesByUrls, getCharacterById } from "@/api/services";
+import InfoRow from "../components/InfoRow";
+import PageMessage from "@/components/PageMessage";
+import {
+  getCharacterById,
+  getResourceIdFromUrl,
+  getResourcesByUrls,
+} from "@/api/services";
+import { parseResourceId } from "@/utils/resourceId";
 
 const CharacterPage = () => {
-  const navigate = useNavigate()
-  const { id } = useParams<{ id: string }>();
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = parseResourceId(routeId);
 
-  const { data, isLoading, error } = useQuery<Character>({
+  const characterQuery = useQuery<Character>({
     queryKey: ["character", id],
-    queryFn: () => getCharacterById(id!),
-    enabled: !!id,
+    queryFn: ({ signal }) => {
+      if (id === null) throw new Error("A valid character ID is required");
+      return getCharacterById(id, signal);
+    },
+    enabled: id !== null,
   });
 
-  const episodeUrls = data?.episode?.slice(0, 4) as string[] | undefined;
+  const episodeUrls = characterQuery.data?.episode.slice(0, 4) ?? [];
 
-  const { data: episodes, isLoading: episodesLoading, error: episodesError } = useQuery<Episode[]>({
-    queryKey: ["episodes", id, episodeUrls],
-    queryFn: () => fetchResourcesByUrls<Episode>(episodeUrls || []),
-    enabled: !!episodeUrls && episodeUrls.length > 0,
-    staleTime: 1000 * 60 * 5,
+  const episodesQuery = useQuery<Episode[]>({
+    queryKey: ["episodes", "character", id, episodeUrls],
+    queryFn: ({ signal }) => getResourcesByUrls<Episode>("episode", episodeUrls, signal),
+    enabled: id !== null && episodeUrls.length > 0,
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Something went wrong</p>;
+  if (id === null) return <PageMessage error>Invalid character ID.</PageMessage>;
+  if (characterQuery.isPending) return <PageMessage>Loading character...</PageMessage>;
+  if (characterQuery.isError) return <PageMessage error>Unable to load this character.</PageMessage>;
+
+  const character = characterQuery.data;
+  const locationId = getResourceIdFromUrl(character.location.url, "location");
 
   return (
     <div className="flex justify-center">
       <div className="container flex flex-col justify-center">
         <div className="flex flex-col gap-4 justify-center items-center py-4 mb-10">
-          <img src={data?.image} alt={data?.name} className="w-[300px] rounded-full border-[5px] border-[#F2F2F7]" />
-          <h1 className="text-[#081F32] font-roboto font-normal text-5xl">{data?.name}</h1>
+          <img
+            src={character.image}
+            alt={character.name}
+            width="300"
+            height="300"
+            className="w-[300px] rounded-full border-[5px] border-[#F2F2F7]"
+          />
+          <h1 className="text-[#081F32] font-roboto font-normal text-4xl sm:text-5xl text-center">{character.name}</h1>
         </div>
 
-        <div className="flex justify-between">
-          <div className="flex flex-col">
-            <h2 className="headline">Informations</h2>
-            <InfoPlank title="Gender" desc={data?.gender} />
-            <InfoPlank title="Status" desc={data?.status} />
-            <InfoPlank title="Specie" desc={data?.species} />
-            <InfoPlank title="Origin" desc={data?.origin.name} />
-            <InfoPlank title="Type" desc={data?.type || "Unknown"} />
-            <InfoPlank title="Location" desc={data?.location.name} onClick={() => navigate(`/location/${data?.location.url.split('/').pop()}`)} icon="../assets/arrow-right.svg" className="cursor-pointer" />
+        <div className="flex flex-col lg:flex-row justify-between gap-10">
+          <div className="flex flex-col flex-1">
+            <h2 className="headline">Information</h2>
+            <InfoRow label="Gender" value={character.gender} />
+            <InfoRow label="Status" value={character.status} />
+            <InfoRow label="Species" value={character.species} />
+            <InfoRow label="Origin" value={character.origin.name} />
+            <InfoRow label="Type" value={character.type || "Unknown"} />
+            <InfoRow
+              label="Location"
+              value={character.location.name}
+              to={locationId ? `/location/${locationId}` : undefined}
+            />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1">
             <h2 className="headline">Episodes</h2>
-            {episodesLoading && <p>Loading episodes...</p>}
-            {episodesError && <p>Failed to load episodes</p>}
-            {episodes?.slice(0, 4).map((ep) => (
-              <InfoPlank
-                key={ep.id}
-                title={ep.episode}
-                desc={ep.name}
-                sndDesc={ep.air_date}
-                icon="../assets/arrow-right.svg"
-                onClick={() => navigate(`/episode/${ep.id}`)}
-                className="cursor-pointer"
+            {episodesQuery.isLoading && <p>Loading episodes...</p>}
+            {episodesQuery.isError && <p role="alert">Unable to load episodes.</p>}
+            {episodesQuery.data?.map((episode) => (
+              <InfoRow
+                key={episode.id}
+                label={episode.episode}
+                value={episode.name}
+                secondaryValue={episode.air_date}
+                to={`/episode/${episode.id}`}
               />
             ))}
           </div>

@@ -1,22 +1,21 @@
 import { useInfiniteQuery, type QueryKey } from "@tanstack/react-query";
-import type { Info } from "@/api/types";
+import type { PageFetcher } from "@/api/services";
 
-export function usePaginatedResource<T, Q = undefined>(
+export function usePaginatedResource<T>(
   queryKey: QueryKey,
-  fetchPage: (page: number, query?: Q) => Promise<Info<T>>,
-  queryArg?: Q
+  fetchPage: PageFetcher<T>,
+  search: string,
 ) {
-  return useInfiniteQuery<Info<T>>({
-    queryKey: [...(Array.isArray(queryKey) ? queryKey : [queryKey]), queryArg] as QueryKey,
-    queryFn: ({ pageParam = 1 }) => fetchPage(pageParam as number, queryArg),
+  return useInfiniteQuery({
+    queryKey: [...queryKey, { search }],
+    queryFn: ({ pageParam, signal }) => fetchPage({ page: pageParam, search, signal }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const nextUrl = lastPage.info?.next;
+      const nextUrl = lastPage.info.next;
       if (!nextUrl) return undefined;
-      const url = new URL(nextUrl);
-      const page = url.searchParams.get("page");
-      return page ? Number(page) : undefined;
+
+      const nextPage = Number(new URL(nextUrl).searchParams.get("page"));
+      return Number.isSafeInteger(nextPage) && nextPage > 0 ? nextPage : undefined;
     },
-    staleTime: 1000 * 60 * 5,
   });
 }
